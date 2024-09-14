@@ -72,8 +72,6 @@ export default function DataTable() {
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = React.useMemo(() => {
-    if (visibleColumns === "all") return columns;
-
     return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
   }, [visibleColumns]);
 
@@ -258,11 +256,7 @@ export default function DataTable() {
         // onSortChange={setSortDescriptor}
       >
         <TableHeader columns={headerColumns}>
-          {(column) => (
-            <TableColumn key={column.uid} allowsSorting={column.sortable}>
-              {column.name}
-            </TableColumn>
-          )}
+          {(column) => <TableColumn key={column.uid}>{column.name}</TableColumn>}
         </TableHeader>
         <TableBody
           emptyContent={"Không có dữ liệu"}
