@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Table,
   TableHeader,
@@ -47,7 +47,7 @@ export default function DataTable() {
   const { data, isLoading } = useSWR(
     `/api/sao-ke?${queryUrl}&page=${page}&pageSize=${rowsPerPage}`,
     async (url) => {
-      let res = await fetch(url, {
+      const res = await fetch(url, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
