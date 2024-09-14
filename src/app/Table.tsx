@@ -82,7 +82,7 @@ export default function DataTable() {
         case "doc_no":
           return <>{user.doc_no}</>;
         case "credit":
-          return <span className="text-nowrap">{moneyFormat(user.credit)}</span>;
+          return <span className="text-nowrap text-right">{moneyFormat(user.credit)}</span>;
         case "detail":
           if (!filterValue) return user.detail;
           const regex = new RegExp(filterValue, "gi");
@@ -211,18 +211,20 @@ export default function DataTable() {
         {/* <span className="w-[30%] text-small text-default-400"> */}
         {/* {selectedKeys === "all" ? "All items selected" : `${selectedKeys.size} of ${filteredItems.length} selected`} */}
         {/* </span> */}
-        <Pagination
-          isCompact
-          showControls
-          showShadow
-          color="primary"
-          page={page}
-          total={Math.ceil((totalCount || 1) / rowsPerPage)}
-          onChange={setPage}
-          classNames={{
-            item: "!w-fit !px-2",
-          }}
-        />
+        <div className="flex-1 flex justify-center">
+          <Pagination
+            isCompact
+            showControls
+            showShadow
+            color="primary"
+            page={page}
+            total={Math.ceil((totalCount || 1) / rowsPerPage)}
+            onChange={setPage}
+            classNames={{
+              item: "!w-fit !px-2",
+            }}
+          />
+        </div>
         <div className="hidden sm:flex w-[30%] justify-end gap-2">
           <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
             Trước
