@@ -85,7 +85,7 @@ export default function DataTable() {
     return filteredUsers;
   }, [users, filterValue, statusFilter]);
 
-  const pages = Math.ceil(filteredItems.length / rowsPerPage);
+  const pages = Math.ceil(totalCount / rowsPerPage);
 
   const sortedItems = React.useMemo(() => {
     return [...items].sort((a, b) => {
