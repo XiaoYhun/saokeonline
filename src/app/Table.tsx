@@ -9,18 +9,16 @@ import {
   TableCell,
   Input,
   Button,
-  DropdownTrigger,
-  Dropdown,
-  DropdownMenu,
-  DropdownItem,
-  Chip,
-  User,
   Pagination,
   Spinner,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@nextui-org/react";
-import { columns, users, statusOptions } from "./data";
+import { columns, users, sortOptions } from "./data";
 import useSWR from "swr";
-import { useKey } from "react-use";
+import { ChevronDownIcon } from "@/components/ChevronDownIcon";
 
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -35,17 +33,14 @@ export default function DataTable() {
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
-  const [statusFilter, setStatusFilter] = React.useState("all");
+  const [sort, setSort] = React.useState("none");
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [sortDescriptor, setSortDescriptor] = React.useState({
-    column: "age",
-    direction: "ascending",
-  });
+
   const [page, setPage] = React.useState(1);
   const [queryUrl, setQueryUrl] = React.useState("");
 
   const { data, isLoading } = useSWR(
-    `/api/sao-ke?${queryUrl}&page=${page}&pageSize=${rowsPerPage}`,
+    `/api/sao-ke?${queryUrl}&page=${page}&pageSize=${rowsPerPage}&sort=${sort}`,
     async (url) => {
       const res = await fetch(url, {
         method: "GET",
@@ -75,27 +70,7 @@ export default function DataTable() {
     return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
   }, [visibleColumns]);
 
-  const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...users];
-
-    if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user) => user.detail.toLowerCase().includes(filterValue.toLowerCase()));
-    }
-
-    return filteredUsers;
-  }, [users, filterValue, statusFilter]);
-
   const pages = Math.ceil(totalCount / rowsPerPage);
-
-  const sortedItems = React.useMemo(() => {
-    return [...items].sort((a, b) => {
-      const first = a[sortDescriptor.column];
-      const second = b[sortDescriptor.column];
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
-    });
-  }, [sortDescriptor, items]);
 
   const renderCell = React.useCallback(
     (user: any, columnKey: any) => {
@@ -115,7 +90,7 @@ export default function DataTable() {
             regex,
             (substring: string) => `<span class="text-yellow-500 font-semibold">${substring}</span>`
           );
-          return <div dangerouslySetInnerHTML={{ __html: highlightedText }}></div>;
+          return <div className="!min-w-[450px]" dangerouslySetInnerHTML={{ __html: highlightedText }}></div>;
         default:
           return cellValue;
       }
@@ -157,7 +132,7 @@ export default function DataTable() {
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between gap-3 items-end">
+        <div className="flex-col md:flex-row flex justify-between gap-3 items-end">
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
@@ -176,7 +151,30 @@ export default function DataTable() {
             }}
           />
           <div className="flex gap-3">
-            {/* . */}
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  className="!min-w-[100px]"
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
+                  {sortOptions.find((s) => s.uid === sort && sort !== "none")?.name || "Sắp xếp"}{" "}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={true}
+                selectedKeys={sort}
+                selectionMode="single"
+              >
+                {sortOptions.map((status) => (
+                  <DropdownItem key={status.uid} onPress={() => setSort(status.uid)}>
+                    {capitalize(status.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>{" "}
             <Button color="primary" onClick={updateQueryUrl}>
               Tìm
             </Button>
@@ -197,7 +195,7 @@ export default function DataTable() {
     );
   }, [
     filterValue,
-    statusFilter,
+    sort,
     visibleColumns,
     onRowsPerPageChange,
     users.length,
@@ -209,10 +207,10 @@ export default function DataTable() {
 
   const bottomContent = React.useMemo(() => {
     return (
-      <div className="py-2 px-2 flex justify-between items-center">
-        <span className="w-[30%] text-small text-default-400">
-          {/* {selectedKeys === "all" ? "All items selected" : `${selectedKeys.size} of ${filteredItems.length} selected`} */}
-        </span>
+      <div className="py-2 px-2 flex justify-center items-center">
+        {/* <span className="w-[30%] text-small text-default-400"> */}
+        {/* {selectedKeys === "all" ? "All items selected" : `${selectedKeys.size} of ${filteredItems.length} selected`} */}
+        {/* </span> */}
         <Pagination
           isCompact
           showControls
@@ -245,10 +243,10 @@ export default function DataTable() {
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
         classNames={{
-          wrapper: "w-[1200px] max-w-full min-h-[400px]",
+          wrapper: "md:w-[1200px] md:max-w-full min-h-[400px] md:!mx-0 -mx-3 w-[100vw]",
         }}
-        selectedKeys={selectedKeys}
-        selectionMode="multiple"
+        // selectedKeys={selectedKeys}
+        // selectionMode="multiple"
         // sortDescriptor={sortDescriptor}
         topContent={topContent}
         topContentPlacement="outside"

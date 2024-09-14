@@ -6,9 +6,16 @@ export async function GET(request: Request) {
   const searchValue = searchParams.get("s") || "";
   const page = searchParams.get("page") || 1;
   const pageSize = searchParams.get("pageSize") || 10;
+  const sort = searchParams.get("sort");
+
   const db = client.db("saoke");
   const collection = db.collection("saoke");
-  const cursor = collection.find({ detail: { $regex: searchValue, $options: "i" } }).sort({ credit: 1 });
+  const cursor = collection.find({ detail: { $regex: searchValue, $options: "i" } });
+  if (sort) {
+    if (sort === "creditasc") cursor.sort("credit", 1);
+    if (sort === "creditdesc") cursor.sort("credit", -1);
+  }
+  console.log(sort);
 
   const [count, data] = await Promise.all([
     cursor.count(),

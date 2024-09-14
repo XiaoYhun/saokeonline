@@ -6,10 +6,10 @@ const columns = [
   { name: "Nội dung", uid: "detail" },
 ];
 
-const statusOptions = [
-  { name: "Active", uid: "active" },
-  { name: "Paused", uid: "paused" },
-  { name: "Vacation", uid: "vacation" },
+const sortOptions = [
+  { name: "Không sắp xếp", uid: "none" },
+  { name: "Số tiền giảm dần", uid: "creditdesc" },
+  { name: "Số tiền tăng dần", uid: "creditasc" },
 ];
 
 const users = [
@@ -342,4 +342,4 @@ const users = [
   },
 ];
 
-export { columns, users, statusOptions };
+export { columns, users, sortOptions };
